@@ -1,0 +1,89 @@
+---
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+import { site } from '../config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Caminho da imagem social (absoluto ou a partir da raiz). */
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+}
+
+const { title, description = site.metaDescricao, image = '/og-default.png', type = 'website', publishedTime } = Astro.props;
+const tituloAba = title ? `${title} — ${site.name}` : `${site.name} ${site.manchete}`;
+const canonical = new URL(Astro.url.pathname, site.url).toString();
+const imagemAbs = new URL(image, site.url).toString();
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{tituloAba}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title={site.name} href="/rss.xml" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <link rel="preload" href="/fonts/Fraunces-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/HankenGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin />
+  <meta name="theme-color" content="#f5f0e7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e1524" media="(prefers-color-scheme: dark)" />
+  <meta property="og:site_name" content={site.name} />
+  <meta property="og:type" content={type} />
+  <meta property="og:title" content={title ?? `${site.name} ${site.manchete}`} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={imagemAbs} />
+  <meta property="og:locale" content="pt_BR" />
+  {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title ?? `${site.name} ${site.manchete}`} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={imagemAbs} />
+</head>
+<body>
+  <div class="coluna">
+    <header class="cabecalho">
+      <a href="/" aria-label="viu, — início" class="marca"><Logo height={36} /></a>
+      <nav aria-label="Páginas" class="nav">
+        <a href="/sobre/">Sobre</a>
+        <a href="/newsletter/">Newsletter</a>
+      </nav>
+    </header>
+
+    <slot />
+
+    <footer class="rodape">
+      <p>viu.blog.br · {site.rodape}</p>
+      <nav aria-label="Rodapé">
+        <a href="/newsletter/">Newsletter</a>
+        <a href="/rss.xml">RSS</a>
+        <a href={`mailto:${site.email}`}>E-mail</a>
+      </nav>
+    </footer>
+  </div>
+</body>
+</html>
+
+<style>
+  .cabecalho { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; }
+  .marca { display: block; line-height: 0; text-decoration: none; }
+  .nav { display: flex; gap: 24px; font-size: 15px; }
+  .nav a { color: var(--tinta-2); text-decoration: none; }
+  .nav a:hover { color: var(--vinho); }
+  .rodape { margin-top: 128px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; font-size: 14px; color: var(--tinta-2); }
+  .rodape p { margin: 0; }
+  .rodape nav { display: flex; gap: 20px; }
+  .rodape a { color: var(--tinta-2); text-decoration: none; }
+  .rodape a:hover { color: var(--vinho); }
+  @media (max-width: 600px) {
+    .cabecalho :global(.logo) { height: 30px; }
+    .nav { gap: 20px; }
+    .rodape { margin-top: 72px; flex-direction: column-reverse; }
+  }
+</style>

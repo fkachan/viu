@@ -1,0 +1,79 @@
+# Painel de edição do viu, — Pages CMS (app.pagescms.org)
+# Entre com sua conta do GitHub, abra este repositório e edite por aqui.
+
+media:
+  input: public/media
+  output: /media
+
+content:
+  - name: textos
+    label: Textos
+    type: collection
+    path: src/content/posts
+    filename: "{year}-{month}-{day}-{title}.md"
+    format: yaml-frontmatter
+    view:
+      primary: title
+      sort: date
+      order: desc
+      fields: [title, category, date, draft]
+    fields:
+      - name: title
+        label: Título
+        type: string
+        required: true
+        description: Até 60 caracteres, afirmação ou pergunta direta, terminando com ponto ou interrogação (o sinal final fica em vinho).
+      - name: subtitle
+        label: Subtítulo
+        type: text
+        description: Uma frase, 90–140 caracteres, que diz o que o leitor ganha.
+      - name: category
+        label: Categoria
+        type: select
+        required: true
+        default: Etc.
+        options:
+          values: [Negócios, Política, Sociedade, Livros, Relações, Etc.]
+      - name: date
+        label: Data
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: draft
+        label: Rascunho (não publicar ainda)
+        type: boolean
+        default: false
+      - name: image
+        label: Imagem para redes sociais (opcional)
+        type: image
+        description: Opcional. 1200×630. Se vazio, usa a capa padrão do viu.
+      - name: body
+        label: Texto
+        type: rich-text
+        description: Use "Citação" para a frase de destaque e "Título 2" para entretítulos.
+
+  - name: sobre
+    label: Página Sobre
+    type: file
+    path: src/content/pages/sobre.md
+    format: yaml-frontmatter
+    fields:
+      - name: title
+        label: Título
+        type: string
+      - name: body
+        label: Texto
+        type: rich-text
+
+  - name: config
+    label: Configurações do site
+    type: file
+    path: src/config.ts
+    format: code
+    fields:
+      - name: body
+        label: Arquivo
+        type: code
+        options:
+          language: typescript

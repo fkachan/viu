@@ -1,0 +1,18 @@
+---
+import { formatarData, urlDoPost, type Post } from '../lib/posts';
+import { slugDaCategoria } from '../config';
+
+interface Props { posts: Post[]; dataCompleta?: boolean }
+const { posts, dataCompleta = true } = Astro.props;
+---
+<div class="lista">
+  {posts.map((post) => (
+    <article>
+      <p class="meta">
+        <a href={`/categoria/${slugDaCategoria(post.data.category)}/`}>{post.data.category}</a>
+        {' · '}{dataCompleta ? formatarData(post.data.date) : formatarData(post.data.date).replace(/ \d{4}$/, '')}
+      </p>
+      <h2 class="titulo-card"><a href={urlDoPost(post)}>{post.data.title}</a></h2>
+    </article>
+  ))}
+</div>

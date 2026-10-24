@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Página não encontrada" description="Essa página não existe.">
+  <section class="erro">
+    <p class="meta">404</p>
+    <h1 class="display">Viu? Não está aqui<span class="pontuacao">.</span></h1>
+    <p class="lead">Ou o endereço mudou, ou eu errei o link. Nos dois casos, <a href="/">a home resolve</a>.</p>
+  </section>
+</Base>
+
+<style>
+  .erro { margin-top: 96px; display: flex; flex-direction: column; gap: 16px; }
+  .erro h1, .erro p { margin: 0; }
+  @media (max-width: 600px) { .erro { margin-top: 56px; } }
+</style>

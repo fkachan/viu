@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import ListaDeTextos from '../components/ListaDeTextos.astro';
+import { textosPublicados } from '../lib/posts';
+
+const todos = await textosPublicados();
+const anos = [...new Set(todos.map((p) => p.data.date.getUTCFullYear()))];
+---
+<Base title="Todos os textos" description="Todos os textos do viu, em ordem cronológica.">
+  <section class="arquivo">
+    <h1 class="display">Todos os textos<span class="pontuacao">.</span></h1>
+    {anos.map((ano) => (
+      <section class="ano" aria-label={String(ano)}>
+        <p class="meta">{ano}</p>
+        <ListaDeTextos posts={todos.filter((p) => p.data.date.getUTCFullYear() === ano)} dataCompleta={false} />
+      </section>
+    ))}
+    {todos.length === 0 && <p class="muted">O primeiro texto está a caminho.</p>}
+  </section>
+</Base>
+
+<style>
+  .arquivo { margin-top: 96px; display: flex; flex-direction: column; gap: 48px; }
+  .arquivo h1 { margin: 0; }
+  .ano { display: flex; flex-direction: column; }
+  .ano .meta { margin: 0 0 12px; }
+  @media (max-width: 600px) { .arquivo { margin-top: 56px; gap: 40px; } }
+</style>

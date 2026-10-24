@@ -1,0 +1,75 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { site, slugDaCategoria } from '../config';
+import { formatarData, separarSinal, slugDoPost, tempoDeLeitura, textosPublicados, urlDoPost } from '../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await textosPublicados();
+  return posts.map((post) => ({ params: { slug: slugDoPost(post) }, props: { post, posts } }));
+}
+
+const { post, posts } = Astro.props;
+const { Content } = await render(post);
+const { texto, sinal } = separarSinal(post.data.title);
+const minutos = tempoDeLeitura(post.body);
+
+// "Leia também": dois textos, de preferência da mesma categoria, nunca o próprio.
+const outros = posts.filter((p) => p.id !== post.id);
+const mesmaCategoria = outros.filter((p) => p.data.category === post.data.category);
+const leiaTambem = [...mesmaCategoria, ...outros.filter((p) => !mesmaCategoria.includes(p))].slice(0, 2);
+
+const assunto = encodeURIComponent(`Sobre "${post.data.title}"`);
+const imagem = post.data.image ? `/media/${post.data.image.replace(/^\/?media\//, '')}` : '/og-default.png';
+---
+<Base title={post.data.title} description={post.data.subtitle || site.metaDescricao} image={imagem} type="article" publishedTime={post.data.date.toISOString()}>
+  <article class="post">
+    <header class="topo">
+      <p class="meta">
+        <a href={`/categoria/${slugDaCategoria(post.data.category)}/`}>{post.data.category}</a>
+        {' · '}{formatarData(post.data.date)}{' · '}{minutos} min
+      </p>
+      <h1 class="display">{texto}<span class="pontuacao">{sinal}</span></h1>
+      {post.data.subtitle && <p class="lead">{post.data.subtitle}</p>}
+    </header>
+
+    <div class="prosa">
+      <Content />
+    </div>
+
+    <p class="fecho">Viu<span class="pontuacao">?</span> Agora me diz onde eu errei — <a href={`mailto:${site.email}?subject=${assunto}`}>por e-mail</a>.</p>
+  </article>
+
+  {leiaTambem.length > 0 && (
+    <nav class="leia-tambem" aria-label="Outros textos">
+      <p class="meta">Leia também</p>
+      {leiaTambem.map((p) => (
+        <a class="titulo-card" href={urlDoPost(p)}>{p.data.title}</a>
+      ))}
+    </nav>
+  )}
+</Base>
+
+<style>
+  .post { margin-top: 96px; display: flex; flex-direction: column; gap: 24px; }
+  .topo { display: flex; flex-direction: column; gap: 24px; margin-bottom: 24px; }
+  .topo .meta { margin: 0; }
+  .topo .meta a { color: var(--tinta-2); text-decoration: none; }
+  .topo .meta a:hover { color: var(--vinho); }
+  .topo h1 { margin: 0; }
+  .topo .lead { margin: 0; }
+  .fecho { margin: 40px 0 0; padding-top: 32px; border-top: var(--hairline) solid var(--fio); }
+  .leia-tambem { margin-top: 96px; display: flex; flex-direction: column; }
+  .leia-tambem .meta { margin: 0 0 12px; }
+  .leia-tambem a { padding: 16px 0; border-top: var(--hairline) solid var(--fio); color: var(--tinta); text-decoration: none; font-size: 22px; }
+  .leia-tambem a:last-child { border-bottom: var(--hairline) solid var(--fio); }
+  .leia-tambem a:hover { text-decoration: underline; text-decoration-thickness: var(--hairline); text-underline-offset: 4px; }
+  @media (max-width: 600px) {
+    .post { margin-top: 56px; gap: 20px; }
+    .topo { gap: 20px; margin-bottom: 16px; }
+    .topo h1 { font-size: 30px; font-variation-settings: var(--display-settings-sm); }
+    .fecho { margin-top: 32px; padding-top: 24px; }
+    .leia-tambem { margin-top: 64px; }
+    .leia-tambem a { padding: 14px 0; font-size: 21px; }
+  }
+</style>

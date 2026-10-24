@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import ListaDeTextos from '../components/ListaDeTextos.astro';
+import { site } from '../config';
+import { separarSinal, textosPublicados } from '../lib/posts';
+
+const todos = await textosPublicados();
+const recentes = todos.slice(0, site.textosNaHome);
+const { texto, sinal } = separarSinal(site.manchete);
+---
+<Base>
+  <section class="abertura">
+    <p class="display manchete">{texto}<span class="pontuacao">{sinal}</span></p>
+    <p class="descricao">{site.descricao}</p>
+  </section>
+
+  <section class="textos" aria-label="Últimos textos">
+    {recentes.length > 0 ? (
+      <ListaDeTextos posts={recentes} />
+    ) : (
+      <p class="muted vazio">O primeiro texto está a caminho.</p>
+    )}
+    {todos.length > site.textosNaHome && <a class="mais" href="/textos/">Textos anteriores →</a>}
+  </section>
+</Base>
+
+<style>
+  .abertura { margin-top: 96px; display: flex; flex-direction: column; gap: 16px; }
+  .manchete { margin: 0; max-width: 560px; }
+  .descricao { margin: 0; max-width: 520px; color: var(--tinta-2); }
+  .textos { margin-top: 96px; display: flex; flex-direction: column; }
+  .mais { align-self: flex-start; margin-top: 32px; font-size: 15px; }
+  .vazio { margin: 0; padding-top: 24px; border-top: var(--hairline) solid var(--fio); }
+  @media (max-width: 600px) {
+    .abertura { margin-top: 64px; gap: 12px; }
+    .descricao { font-size: 16px; }
+    .textos { margin-top: 56px; }
+    .mais { margin-top: 28px; }
+  }
+</style>

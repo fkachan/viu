@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import ListaDeTextos from '../../components/ListaDeTextos.astro';
+import { categorias } from '../../config';
+import { textosPublicados } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await textosPublicados();
+  return categorias.map((c) => ({
+    params: { categoria: c.slug },
+    props: { nome: c.nome, posts: posts.filter((p) => p.data.category === c.nome) },
+  }));
+}
+
+const { nome, posts } = Astro.props;
+---
+<Base title={nome} description={`Textos do viu, em ${nome}.`}>
+  <section class="categoria">
+    <p class="meta">Categoria</p>
+    <h1 class="display">{nome.replace(/\.$/, '')}<span class="pontuacao">.</span></h1>
+    {posts.length > 0 ? <ListaDeTextos posts={posts} /> : <p class="muted vazio">Ainda não escrevi sobre isso. Mas vou.</p>}
+  </section>
+</Base>
+
+<style>
+  .categoria { margin-top: 96px; display: flex; flex-direction: column; gap: 16px; }
+  .categoria .meta { margin: 0; }
+  .categoria h1 { margin: 0 0 32px; }
+  .vazio { margin: 0; padding-top: 24px; border-top: var(--hairline) solid var(--fio); }
+  @media (max-width: 600px) { .categoria { margin-top: 56px; } }
+</style>
