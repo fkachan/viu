@@ -1,0 +1,12 @@
+{
+  // viu, — site estático servido pela Cloudflare como Worker de assets.
+  // A pasta dist é gerada por `npm run build` (Astro). Sem `main`, é 100% estático.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "viu",
+  "compatibility_date": "2026-10-19",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}
